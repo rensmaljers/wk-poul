@@ -143,6 +143,8 @@ export async function GET(request: Request) {
             away_team: awayTeam,
             home_flag: getFlag(homeTeam),
             away_flag: getFlag(awayTeam),
+            home_crest: match.homeTeam?.crest ?? null,
+            away_crest: match.awayTeam?.crest ?? null,
             home_score: match.score?.fullTime?.home ?? null,
             away_score: match.score?.fullTime?.away ?? null,
             match_date: match.utcDate,

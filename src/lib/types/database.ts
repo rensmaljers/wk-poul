@@ -30,6 +30,8 @@ export type Database = {
           away_team: string
           home_flag: string | null
           away_flag: string | null
+          home_crest: string | null
+          away_crest: string | null
           home_score: number | null
           away_score: number | null
           competition: string

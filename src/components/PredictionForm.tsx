@@ -20,6 +20,22 @@ function pointsBadge(points: number | null) {
   return { text: '0', color: 'bg-gray-100 text-gray-400' }
 }
 
+function TeamBadge({ name, flag, crest, align }: { name: string; flag: string | null; crest: string | null; align: 'left' | 'right' }) {
+  const icon = crest ? (
+    <img src={crest} alt="" className="w-5 h-5 sm:w-6 sm:h-6 object-contain flex-shrink-0" />
+  ) : flag ? (
+    <span className="flex-shrink-0">{flag}</span>
+  ) : null
+
+  return (
+    <div className={`flex items-center gap-1.5 ${align === 'right' ? 'justify-end' : ''}`}>
+      {align === 'right' && <span className="font-medium text-gray-900 text-sm truncate">{name}</span>}
+      {icon}
+      {align === 'left' && <span className="font-medium text-gray-900 text-sm truncate">{name}</span>}
+    </div>
+  )
+}
+
 export default function PredictionForm({
   match,
   prediction,
@@ -86,9 +102,8 @@ export default function PredictionForm({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex-1 text-right text-sm truncate">
-            {match.home_flag && <span className="mr-1">{match.home_flag}</span>}
-            <span className="font-medium text-gray-900">{match.home_team}</span>
+          <div className="flex-1 min-w-0">
+            <TeamBadge name={match.home_team} flag={match.home_flag} crest={match.home_crest} align="right" />
           </div>
           <input
             type="number" min="0" max="20" value={homeScore}
@@ -105,9 +120,8 @@ export default function PredictionForm({
             className="w-9 h-8 text-center text-sm font-bold border border-gray-200 rounded focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
             placeholder="-"
           />
-          <div className="flex-1 text-sm truncate">
-            {match.away_flag && <span className="mr-1">{match.away_flag}</span>}
-            <span className="font-medium text-gray-900">{match.away_team}</span>
+          <div className="flex-1 min-w-0">
+            <TeamBadge name={match.away_team} flag={match.away_flag} crest={match.away_crest} align="left" />
           </div>
           {!locked && (
             <button
@@ -127,11 +141,8 @@ export default function PredictionForm({
       <div className="hidden sm:flex items-center gap-2">
         <span className="text-xs text-gray-400 w-11 flex-shrink-0">{formatTime(match.match_date)}</span>
 
-        <div className="w-40 text-right flex-shrink-0">
-          <span className="font-medium text-gray-900 text-sm">
-            {match.home_team}
-          </span>
-          {match.home_flag && <span className="ml-1.5">{match.home_flag}</span>}
+        <div className="w-44 flex-shrink-0">
+          <TeamBadge name={match.home_team} flag={match.home_flag} crest={match.home_crest} align="right" />
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
@@ -152,9 +163,8 @@ export default function PredictionForm({
           />
         </div>
 
-        <div className="w-40 flex-shrink-0">
-          {match.away_flag && <span className="mr-1.5">{match.away_flag}</span>}
-          <span className="font-medium text-gray-900 text-sm">{match.away_team}</span>
+        <div className="w-44 flex-shrink-0">
+          <TeamBadge name={match.away_team} flag={match.away_flag} crest={match.away_crest} align="left" />
         </div>
 
         {/* Result + points + save */}
