@@ -5,11 +5,8 @@ import type { Match, Prediction } from '@/lib/types/database'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('nl-NL', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
+function formatTime(dateStr: string) {
+  return new Date(dateStr).toLocaleTimeString('nl-NL', {
     hour: '2-digit',
     minute: '2-digit',
   })
@@ -21,6 +18,15 @@ function pointsLabel(points: number | null) {
   if (points === 3) return { text: 'Verschil +3', color: 'bg-blue-100 text-blue-700' }
   if (points === 2) return { text: 'Winnaar +2', color: 'bg-orange-100 text-orange-700' }
   return { text: '0 punten', color: 'bg-gray-100 text-gray-500' }
+}
+
+function statusLabel(status: string) {
+  switch (status) {
+    case 'FINISHED': return { text: 'Gespeeld', color: 'bg-green-100 text-green-700' }
+    case 'LIVE': case 'IN_PLAY': return { text: 'LIVE', color: 'bg-red-100 text-red-700 animate-pulse' }
+    case 'PAUSED': return { text: 'Rust', color: 'bg-yellow-100 text-yellow-700' }
+    default: return null
+  }
 }
 
 export default function PredictionForm({
@@ -69,17 +75,30 @@ export default function PredictionForm({
   }
 
   const pl = pointsLabel(prediction?.points ?? null)
+  const status = statusLabel(match.status)
 
   return (
     <div className={`bg-white rounded-xl shadow-sm border p-4 ${
-      locked ? 'border-gray-100' : 'border-gray-200'
+      locked ? 'border-gray-100' : 'border-orange-200'
     }`}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-400">{formatDate(match.match_date)}</span>
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">{formatTime(match.match_date)}</span>
+          {match.group_name && (
+            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+              Groep {match.group_name}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {status && (
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${status.color}`}>
+              {status.text}
+            </span>
+          )}
           {match.status === 'FINISHED' && match.home_score !== null && (
-            <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-              Uitslag: {match.home_score} - {match.away_score}
+            <span className="text-xs font-semibold bg-gray-800 text-white px-2 py-0.5 rounded-full">
+              {match.home_score} - {match.away_score}
             </span>
           )}
           {pl && (
