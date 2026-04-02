@@ -19,11 +19,11 @@ export default async function LeaderboardPage() {
             <tr className="bg-gray-50 border-b border-gray-100">
               <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
               <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Exact</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Verschil</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Winnaar</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Bonus</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Punten</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell" title="Exacte score voorspeld (5 punten per keer)">Exact</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell" title="Juist doelpuntenverschil voorspeld (3 punten per keer)">Verschil</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell" title="Juiste winnaar of gelijkspel voorspeld (2 punten per keer)">Winnaar</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell" title="Punten verdiend met bonusvragen">Bonus</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider" title="Totaal aantal punten (wedstrijden + bonus)">Punten</th>
             </tr>
           </thead>
           <tbody>
