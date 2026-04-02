@@ -62,12 +62,6 @@ const BONUS_QUESTIONS = [
     type: 'select' as const,
     options: WK_LANDEN,
   },
-  {
-    key: 'biggest_surprise',
-    question: 'Welk land uit pot 3 of 4 haalt de kwartfinale?',
-    points: 10,
-    type: 'text' as const,
-  },
 ]
 
 export { BONUS_QUESTIONS }

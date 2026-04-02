@@ -13,7 +13,6 @@ const QUESTION_LABELS: Record<string, { label: string; maxPoints: number }> = {
   most_goals_team: { label: 'Welk land scoort de meeste doelpunten?', maxPoints: 10 },
   total_goals: { label: 'Hoeveel doelpunten in totaal?', maxPoints: 10 },
   first_red_card: { label: 'Welk land krijgt de eerste rode kaart?', maxPoints: 7 },
-  biggest_surprise: { label: 'Welk land uit pot 3/4 haalt de kwartfinale?', maxPoints: 10 },
 }
 
 type BonusWithName = BonusPrediction & { display_name: string }
