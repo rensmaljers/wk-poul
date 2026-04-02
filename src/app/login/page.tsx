@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md mx-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900">WK Poule 2026</h1>
-          <p className="text-lg text-gray-600 mt-2">Elloro X Recranet</p>
+          <p className="text-lg text-gray-600 mt-2">Recranet X Elloro</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">

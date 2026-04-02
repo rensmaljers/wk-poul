@@ -4,19 +4,13 @@ import Link from 'next/link'
 import AdminBonusScorer from '@/components/AdminBonusScorer'
 import type { BonusPrediction } from '@/lib/types/database'
 
-// Hardcoded admin emails - add your own
-const ADMIN_EMAILS = [
-  'rens@recranet.com',
-  'rens@elloro.nl',
-  'rensmaljers@gmail.com',
-  'dazz@elloro.nl',
-]
+import { isAdmin } from '@/lib/config'
 
 export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || !ADMIN_EMAILS.includes(user.email ?? '')) {
+  if (!user || !isAdmin(user.email)) {
     redirect('/')
   }
 

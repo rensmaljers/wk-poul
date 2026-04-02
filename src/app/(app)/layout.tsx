@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navigation from '@/components/Navigation'
+import { config } from '@/lib/config'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -21,7 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {children}
       </main>
       <footer className="text-center py-4 text-sm text-gray-400 border-t border-gray-100">
-        Elloro X Recranet &middot; WK Poule 2026
+        {config.companyName} &middot; {config.appName}
       </footer>
     </>
   )

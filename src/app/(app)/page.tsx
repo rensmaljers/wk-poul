@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Tooltip from '@/components/Tooltip'
 import Countdown from '@/components/Countdown'
+import { config, getCompetition } from '@/lib/config'
 import type { Prediction, Match } from '@/lib/types/database'
-
-const FIRST_MATCH_DATE = '2026-06-11T19:00:00+00:00'
 
 type LeaderboardRow = {
   id: string
@@ -22,7 +21,8 @@ export default async function LeaderboardPage({
 }: {
   searchParams: Promise<{ comp?: string }>
 }) {
-  const { comp = 'WC' } = await searchParams
+  const { comp = config.defaultCompetition } = await searchParams
+  const compConfig = getCompetition(comp)
   const isWC = comp === 'WC'
 
   const supabase = await createClient()
@@ -79,17 +79,14 @@ export default async function LeaderboardPage({
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {isWC ? 'WK Poule 2026' : 'Eredivisie Poule'}
+          {compConfig.icon} {compConfig.label} Poule
         </h1>
         <p className="text-gray-500">
-          {isWC
-            ? 'Welkom bij de WK Poule van Recranet X Elloro! Voorspel de uitslagen, verdien punten en claim de titel.'
-            : 'Voorspel alle Eredivisie uitslagen en strijd om de titel!'
-          }
+          Welkom bij de {compConfig.label} Poule van {config.companyName}! {config.tagline}
         </p>
       </div>
 
-      {isWC && <Countdown targetDate={FIRST_MATCH_DATE} />}
+      {compConfig.firstMatchDate && <Countdown targetDate={compConfig.firstMatchDate} />}
 
       <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <h2 className="font-semibold text-gray-900 mb-3">Puntentelling</h2>
