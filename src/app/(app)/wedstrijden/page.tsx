@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import PredictionForm from '@/components/PredictionForm'
-import CompetitionSwitcher from '@/components/CompetitionSwitcher'
 import type { Match, Prediction } from '@/lib/types/database'
 
 export default async function WedstrijdenPage({
@@ -68,8 +67,6 @@ export default async function WedstrijdenPage({
           {filledIn}/{totalMatches}
         </span>
       </div>
-
-      <CompetitionSwitcher current={comp} />
 
       {allMatches.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">

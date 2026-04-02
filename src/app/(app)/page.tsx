@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Tooltip from '@/components/Tooltip'
 import Countdown from '@/components/Countdown'
-import CompetitionSwitcher from '@/components/CompetitionSwitcher'
 import type { Prediction, Match } from '@/lib/types/database'
 
 const FIRST_MATCH_DATE = '2026-06-11T19:00:00+00:00'
@@ -89,8 +88,6 @@ export default async function LeaderboardPage({
           }
         </p>
       </div>
-
-      <CompetitionSwitcher current={comp} />
 
       {isWC && <Countdown targetDate={FIRST_MATCH_DATE} />}
 
