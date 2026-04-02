@@ -22,6 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl" className="h-full antialiased">
+      <head>
+        <link href="https://api.fontshare.com/v2/css?f[]=clash-display@1&display=swap" rel="stylesheet" />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
