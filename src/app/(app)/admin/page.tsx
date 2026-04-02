@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import AdminBonusScorer from '@/components/AdminBonusScorer'
 import type { BonusPrediction } from '@/lib/types/database'
 
@@ -48,6 +49,10 @@ export default async function AdminPage() {
       <p className="text-gray-500 mb-6">
         Bekijk alle ingevulde bonusantwoorden en ken punten toe.
       </p>
+
+      <Link href="/admin/stats" className="text-sm text-orange-500 hover:text-orange-600">
+        Bekijk stats & feitjes →
+      </Link>
 
       <AdminBonusScorer grouped={grouped} />
     </div>
