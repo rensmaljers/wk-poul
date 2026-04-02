@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { LeaderboardEntry } from '@/lib/types/database'
+import Tooltip from '@/components/Tooltip'
 
 export default async function LeaderboardPage() {
   const supabase = await createClient()
@@ -51,11 +52,21 @@ export default async function LeaderboardPage() {
             <tr className="bg-gray-50 border-b border-gray-100">
               <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
               <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Naam</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-green-600 uppercase tracking-wider hidden sm:table-cell cursor-help" title="Exacte score voorspeld — 5 punten per keer">Exact</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-blue-600 uppercase tracking-wider hidden sm:table-cell cursor-help" title="Juist doelpuntenverschil voorspeld — 3 punten per keer">Verschil</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-amber-600 uppercase tracking-wider hidden sm:table-cell cursor-help" title="Juiste winnaar of gelijkspel voorspeld — 2 punten per keer">Winnaar</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-purple-600 uppercase tracking-wider hidden sm:table-cell cursor-help" title="Punten verdiend met bonusvragen">Bonus</th>
-              <th className="text-center py-3 px-4 text-xs font-semibold text-orange-600 uppercase tracking-wider cursor-help" title="Totaal aantal punten (wedstrijden + bonus)">Punten</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-green-600 uppercase tracking-wider hidden sm:table-cell">
+                <Tooltip text="Exacte score voorspeld — 5 punten per keer">Exact</Tooltip>
+              </th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-blue-600 uppercase tracking-wider hidden sm:table-cell">
+                <Tooltip text="Juist doelpuntenverschil voorspeld — 3 punten per keer">Verschil</Tooltip>
+              </th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-amber-600 uppercase tracking-wider hidden sm:table-cell">
+                <Tooltip text="Juiste winnaar of gelijkspel — 2 punten per keer">Winnaar</Tooltip>
+              </th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-purple-600 uppercase tracking-wider hidden sm:table-cell">
+                <Tooltip text="Punten verdiend met bonusvragen">Bonus</Tooltip>
+              </th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-orange-600 uppercase tracking-wider">
+                <Tooltip text="Totaal aantal punten (wedstrijden + bonus)">Punten</Tooltip>
+              </th>
             </tr>
           </thead>
           <tbody>
