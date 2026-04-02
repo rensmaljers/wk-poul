@@ -121,6 +121,35 @@ export default async function LeaderboardPage() {
           </tbody>
         </table>
       </div>
+
+      <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h2 className="font-semibold text-gray-900 mb-3">Hoe werkt het?</h2>
+        <div className="space-y-3 text-sm text-gray-600">
+          <p>
+            Voorspel de uitslag van alle WK-wedstrijden en verdien punten op basis van je voorspelling.
+            Hoe dichter bij de echte uitslag, hoe meer punten.
+          </p>
+          <div>
+            <p className="font-medium text-gray-800 mb-1">Wedstrijdpunten</p>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li><span className="text-green-700 font-medium">5 punten</span> — Exacte score (bijv. je voorspelt 2-1 en het wordt 2-1)</li>
+              <li><span className="text-blue-700 font-medium">3 punten</span> — Juist doelpuntenverschil (bijv. je voorspelt 3-1 en het wordt 2-0)</li>
+              <li><span className="text-amber-700 font-medium">2 punten</span> — Juiste winnaar of gelijkspel</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium text-gray-800 mb-1">Bonuspunten</p>
+            <ul className="list-disc list-inside space-y-0.5">
+              <li><span className="text-purple-700 font-medium">Toernooi vragen</span> — Voorspel de wereldkampioen, topscorer, kaarten en meer (tot 15 pt per vraag)</li>
+              <li><span className="text-purple-700 font-medium">Groepsfase</span> — Voorspel de nummer 1 en 2 van elke groep (3 pt voor #1, 2 pt voor #2)</li>
+            </ul>
+          </div>
+          <p className="text-gray-400 text-xs">
+            Voorspellingen vergrendelen bij de start van elke wedstrijd. Bonusvragen moeten vóór de eerste wedstrijd ingevuld zijn.
+            Punten worden automatisch berekend, behalve bonusvragen die handmatig door de admin worden gescoord.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

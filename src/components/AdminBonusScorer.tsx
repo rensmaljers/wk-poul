@@ -5,14 +5,25 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { BonusPrediction } from '@/lib/types/database'
 
+const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L']
+
 const QUESTION_LABELS: Record<string, { label: string; maxPoints: number }> = {
   world_champion: { label: 'Wie wordt wereldkampioen?', maxPoints: 15 },
-  runner_up: { label: 'Wie wordt de verliezend finalist?', maxPoints: 10 },
-  top_scorer: { label: 'Wie wordt topscorer van het toernooi?', maxPoints: 10 },
+  runner_up: { label: 'Verliezend finalist?', maxPoints: 10 },
+  top_scorer: { label: 'Topscorer?', maxPoints: 10 },
   netherlands_stage: { label: 'Hoe ver komt Nederland?', maxPoints: 10 },
-  most_goals_team: { label: 'Welk land scoort de meeste doelpunten?', maxPoints: 10 },
-  total_goals: { label: 'Hoeveel doelpunten in totaal?', maxPoints: 10 },
-  first_red_card: { label: 'Welk land krijgt de eerste rode kaart?', maxPoints: 7 },
+  most_goals_team: { label: 'Meeste doelpunten (land)?', maxPoints: 10 },
+  total_goals: { label: 'Totaal doelpunten?', maxPoints: 10 },
+  most_yellow_cards: { label: 'Meeste gele kaarten (land)?', maxPoints: 7 },
+  most_red_cards: { label: 'Meeste rode kaarten (land)?', maxPoints: 7 },
+  first_red_card: { label: 'Eerste rode kaart (land)?', maxPoints: 7 },
+  highest_scoring_match: { label: 'Goals in doelpuntrijkste wedstrijd?', maxPoints: 7 },
+  best_goalkeeper: { label: 'Gouden Handschoen?', maxPoints: 7 },
+  best_young_player: { label: 'Beste jonge speler?', maxPoints: 7 },
+  ...Object.fromEntries(GROUPS.flatMap(g => [
+    [`group_${g}_winner`, { label: `Groep ${g} — Nummer 1`, maxPoints: 3 }],
+    [`group_${g}_runnerup`, { label: `Groep ${g} — Nummer 2`, maxPoints: 2 }],
+  ])),
 }
 
 type BonusWithName = BonusPrediction & { display_name: string }
