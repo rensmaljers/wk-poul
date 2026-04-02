@@ -1,6 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import type { LeaderboardEntry } from '@/lib/types/database'
 import Tooltip from '@/components/Tooltip'
+import Countdown from '@/components/Countdown'
+
+// First match: June 11 2026, 19:00 UTC
+const FIRST_MATCH_DATE = '2026-06-11T19:00:00+00:00'
 
 export default async function LeaderboardPage() {
   const supabase = await createClient()
@@ -18,6 +22,8 @@ export default async function LeaderboardPage() {
           Welkom bij de WK Poule van Recranet X Elloro! Voorspel de uitslagen, verdien punten en claim de titel.
         </p>
       </div>
+
+      <Countdown targetDate={FIRST_MATCH_DATE} />
 
       <div className="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <h2 className="font-semibold text-gray-900 mb-3">Puntentelling</h2>

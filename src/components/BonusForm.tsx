@@ -16,10 +16,12 @@ export default function BonusForm({
   question,
   currentAnswer,
   points,
+  compact = false,
 }: {
   question: BonusQuestion
   currentAnswer: string
   points: number | null
+  compact?: boolean
 }) {
   const [answer, setAnswer] = useState(currentAnswer)
   const [saving, setSaving] = useState(false)
@@ -48,6 +50,49 @@ export default function BonusForm({
     router.refresh()
   }
 
+  // Compact mode for group predictions (inline within group card)
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 min-w-0 flex-shrink-0">
+          <span className="text-xs font-medium text-gray-600">{question.question}</span>
+          <span className="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-medium">
+            {question.points}pt
+          </span>
+        </div>
+        <select
+          value={answer}
+          onChange={(e) => {
+            setAnswer(e.target.value)
+          }}
+          className="flex-1 min-w-0 rounded-lg border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-orange-500 focus:outline-none"
+        >
+          <option value="">Kies...</option>
+          {question.options?.map(opt => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+        <button
+          onClick={handleSave}
+          disabled={saving || !answer.trim()}
+          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex-shrink-0 ${
+            saved
+              ? 'bg-green-100 text-green-700'
+              : 'bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-40'
+          }`}
+        >
+          {saving ? '...' : saved ? '✓' : '→'}
+        </button>
+        {points !== null && (
+          <span className={`text-xs font-semibold flex-shrink-0 ${points > 0 ? 'text-green-600' : 'text-gray-400'}`}>
+            {points > 0 ? `+${points}` : '0'}
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  // Full mode for tournament questions
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
       <div className="flex items-start justify-between mb-3">

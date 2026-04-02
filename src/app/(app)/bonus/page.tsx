@@ -176,7 +176,7 @@ export default async function BonusPage() {
         <span className="w-1 h-6 bg-orange-500 rounded-full"></span>
         Toernooi voorspellingen
       </h2>
-      <div className="space-y-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {TOURNAMENT_QUESTIONS.map((q) => (
           <BonusForm
             key={q.key}
@@ -195,15 +195,33 @@ export default async function BonusPage() {
       <p className="text-sm text-gray-400 mb-4">
         Voorspel de nummer 1 en 2 van elke groep. Vul dit in vóór de eerste wedstrijd!
       </p>
-      <div className="space-y-3">
-        {GROUP_QUESTIONS.map((q) => (
-          <BonusForm
-            key={q.key}
-            question={q}
-            currentAnswer={predictionMap.get(q.key)?.answer ?? ''}
-            points={predictionMap.get(q.key)?.points ?? null}
-          />
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.entries(GROEPEN).map(([group, teams]) => {
+          const winnerKey = `group_${group}_winner`
+          const runnerKey = `group_${group}_runnerup`
+          return (
+            <div key={group} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-orange-600 px-4 py-2">
+                <h3 className="text-sm font-bold text-white">Groep {group}</h3>
+              </div>
+              <div className="p-4 space-y-3">
+                <p className="text-xs text-gray-400">{teams.join(' · ')}</p>
+                <BonusForm
+                  question={{ key: winnerKey, question: 'Nummer 1', points: 3, type: 'select', options: teams }}
+                  currentAnswer={predictionMap.get(winnerKey)?.answer ?? ''}
+                  points={predictionMap.get(winnerKey)?.points ?? null}
+                  compact
+                />
+                <BonusForm
+                  question={{ key: runnerKey, question: 'Nummer 2', points: 2, type: 'select', options: teams }}
+                  currentAnswer={predictionMap.get(runnerKey)?.answer ?? ''}
+                  points={predictionMap.get(runnerKey)?.points ?? null}
+                  compact
+                />
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
