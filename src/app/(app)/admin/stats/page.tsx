@@ -104,6 +104,94 @@ export default async function StatsPage() {
     .filter(u => u.totalPredictions > 0)
     .sort((a, b) => (parseFloat(b.avgHome) + parseFloat(b.avgAway)) - (parseFloat(a.avgHome) + parseFloat(a.avgAway)))
 
+  // --- Fun Awards ---
+  const activeUsers = userStats.filter(u => u.totalPredictions >= 5)
+
+  // "De Eenling" - most unique predictor (least overlap with others)
+  const uniqueScores = activeUsers.map(u => {
+    const userPreds = allPredictions.filter(p => p.user_id === u.id)
+    let uniqueCount = 0
+    for (const pred of userPreds) {
+      const othersWithSame = allPredictions.filter(p =>
+        p.match_id === pred.match_id && p.user_id !== u.id &&
+        p.home_score === pred.home_score && p.away_score === pred.away_score
+      ).length
+      if (othersWithSame === 0) uniqueCount++
+    }
+    return { ...u, uniqueCount, uniquePct: userPreds.length ? ((uniqueCount / userPreds.length) * 100).toFixed(0) : '0' }
+  }).sort((a, b) => b.uniqueCount - a.uniqueCount)
+
+  // "1-0 Liefhebber" - most used single score
+  const userFavScores = activeUsers.map(u => {
+    const userPreds = allPredictions.filter(p => p.user_id === u.id)
+    const counts: Record<string, number> = {}
+    userPreds.forEach(p => {
+      const key = `${p.home_score}-${p.away_score}`
+      counts[key] = (counts[key] ?? 0) + 1
+    })
+    const [favScore, favCount] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0] ?? ['-', 0]
+    return { ...u, favScore, favCount: favCount as number, favPct: userPreds.length ? ((favCount as number / userPreds.length) * 100).toFixed(0) : '0' }
+  }).sort((a, b) => b.favCount - a.favCount)
+
+  // "Oranje fan" - highest avg goals given to Netherlands
+  const nlMatches = allMatches.filter(m => m.home_team === 'Netherlands' || m.away_team === 'Netherlands')
+  const nlFans = activeUsers.map(u => {
+    const nlPreds = allPredictions.filter(p =>
+      p.user_id === u.id && nlMatches.some(m => m.id === p.match_id)
+    )
+    let totalNlGoals = 0
+    for (const pred of nlPreds) {
+      const match = nlMatches.find(m => m.id === pred.match_id)
+      if (!match) continue
+      totalNlGoals += match.home_team === 'Netherlands' ? pred.home_score : pred.away_score
+    }
+    return { ...u, nlGoals: totalNlGoals, nlMatches: nlPreds.length, nlAvg: nlPreds.length ? (totalNlGoals / nlPreds.length).toFixed(1) : '0' }
+  }).sort((a, b) => parseFloat(b.nlAvg) - parseFloat(a.nlAvg))
+
+  // "Clean sheet koning" - most 0s predicted
+  const cleanSheetKings = activeUsers.map(u => {
+    const userPreds = allPredictions.filter(p => p.user_id === u.id)
+    const cleanSheets = userPreds.filter(p => p.home_score === 0 || p.away_score === 0).length
+    return { ...u, cleanSheets, csPct: userPreds.length ? ((cleanSheets / userPreds.length) * 100).toFixed(0) : '0' }
+  }).sort((a, b) => b.cleanSheets - a.cleanSheets)
+
+  // "De Mainstream" - most predictions that match the majority
+  const mainstreamers = activeUsers.map(u => {
+    const userPreds = allPredictions.filter(p => p.user_id === u.id)
+    let mainstreamCount = 0
+    for (const pred of userPreds) {
+      const matchPreds = allPredictions.filter(p => p.match_id === pred.match_id)
+      const counts: Record<string, number> = {}
+      matchPreds.forEach(p => {
+        const key = `${p.home_score}-${p.away_score}`
+        counts[key] = (counts[key] ?? 0) + 1
+      })
+      const mostPopular = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]
+      if (mostPopular && `${pred.home_score}-${pred.away_score}` === mostPopular[0]) {
+        mainstreamCount++
+      }
+    }
+    return { ...u, mainstreamCount, msPct: userPreds.length ? ((mainstreamCount / userPreds.length) * 100).toFixed(0) : '0' }
+  }).sort((a, b) => b.mainstreamCount - a.mainstreamCount)
+
+  // Biggest upset believer - most away wins predicted
+  const upsetBelievers = activeUsers.map(u => {
+    const pct = u.totalPredictions ? ((u.awayWins / u.totalPredictions) * 100).toFixed(0) : '0'
+    return { ...u, awayPct: pct }
+  }).sort((a, b) => b.awayWins - a.awayWins)
+
+  // Fun awards compilation
+  const awards = [
+    { icon: '🦄', title: 'De Eenling', desc: 'Meest unieke voorspellingen', winner: uniqueScores[0], detail: `${uniqueScores[0]?.uniqueCount} unieke voorspellingen (${uniqueScores[0]?.uniquePct}%)` },
+    { icon: '🔁', title: 'Favoriete Score', desc: 'Meest gebruikte uitslag', winner: userFavScores[0], detail: `${userFavScores[0]?.favScore} — ${userFavScores[0]?.favCount}x (${userFavScores[0]?.favPct}%)` },
+    { icon: '🧡', title: 'Oranje Fan', desc: 'Meeste goals voor Nederland', winner: nlFans[0], detail: `gem. ${nlFans[0]?.nlAvg} goals voor NL` },
+    { icon: '🧤', title: 'Clean Sheet Koning', desc: 'Meeste nulletjes voorspeld', winner: cleanSheetKings[0], detail: `${cleanSheetKings[0]?.cleanSheets} clean sheets (${cleanSheetKings[0]?.csPct}%)` },
+    { icon: '🐑', title: 'De Mainstream', desc: 'Vaakst hetzelfde als de meerderheid', winner: mainstreamers[0], detail: `${mainstreamers[0]?.mainstreamCount}x populairste keuze (${mainstreamers[0]?.msPct}%)` },
+    { icon: '🔮', title: 'Upset Believer', desc: 'Gelooft het meest in de underdog', winner: upsetBelievers[0], detail: `${upsetBelievers[0]?.awayWins} uitzeges (${upsetBelievers[0]?.awayPct}%)` },
+    { icon: '🎰', title: 'Doelpuntenfestijn', desc: 'Hoogste totaal voorspeld', winner: highestTotal.pred ? allProfiles.find(p => p.id === highestTotal.pred!.user_id) : null, detail: highestTotal.pred ? `${highestTotal.pred.home_score}-${highestTotal.pred.away_score} (${highestTotal.total} goals)` : '-' },
+    { icon: '😴', title: 'De Saaie', desc: 'Minst gevarieerde voorspellingen', winner: userFavScores[userFavScores.length - 1] ? { ...userFavScores.sort((a, b) => parseInt(b.favPct) - parseInt(a.favPct))[0] } : null, detail: userFavScores.length ? `${userFavScores.sort((a, b) => parseInt(b.favPct) - parseInt(a.favPct))[0]?.favScore} in ${userFavScores.sort((a, b) => parseInt(b.favPct) - parseInt(a.favPct))[0]?.favPct}% van de wedstrijden` : '-' },
+  ].filter(a => a.winner)
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Stats & Feitjes</h1>
@@ -121,6 +209,23 @@ export default async function StatsPage() {
             <div className="text-2xl mb-1">{s.icon}</div>
             <div className="text-2xl font-bold text-gray-900">{s.value}</div>
             <div className="text-xs text-gray-500">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Fun Awards */}
+      <h2 className="text-lg font-semibold text-gray-900 mb-3">Awards</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+        {awards.map(award => (
+          <div key={award.title} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <div className="text-3xl mb-2">{award.icon}</div>
+            <h3 className="font-bold text-gray-900 text-sm">{award.title}</h3>
+            <p className="text-xs text-gray-400 mb-2">{award.desc}</p>
+            <p className="text-sm font-semibold text-orange-600">
+              {String((award.winner as Record<string, string>)?.avatar_url ?? '')}{' '}
+              {String((award.winner as Record<string, string>)?.display_name ?? '')}
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">{award.detail}</p>
           </div>
         ))}
       </div>
