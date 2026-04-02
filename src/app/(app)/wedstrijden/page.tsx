@@ -84,31 +84,28 @@ export default async function WedstrijdenPage() {
                 {stage}
               </h2>
 
-              {Object.entries(byDate).map(([dateKey, dateMatches]) => (
-                <div key={dateKey} className="mb-3">
-                  <div className="flex items-center gap-3 mb-1.5">
-                    <div className="h-px bg-gray-200 flex-1"></div>
-                    <span className="text-xs font-medium text-gray-400">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {Object.entries(byDate).map(([dateKey, dateMatches]) => (
+                  <div key={dateKey}>
+                    <div className="text-xs font-medium text-gray-400 mb-1.5 text-center">
                       {formatDateHeader(dateMatches[0].match_date)}
-                    </span>
-                    <div className="h-px bg-gray-200 flex-1"></div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-50">
+                      {dateMatches.map((match) => {
+                        const locked = new Date(match.match_date) <= now
+                        return (
+                          <PredictionForm
+                            key={match.id}
+                            match={match}
+                            prediction={predictionMap.get(match.id) ?? null}
+                            locked={locked}
+                          />
+                        )
+                      })}
+                    </div>
                   </div>
-
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-50">
-                    {dateMatches.map((match) => {
-                      const locked = new Date(match.match_date) <= now
-                      return (
-                        <PredictionForm
-                          key={match.id}
-                          match={match}
-                          prediction={predictionMap.get(match.id) ?? null}
-                          locked={locked}
-                        />
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )
         })
