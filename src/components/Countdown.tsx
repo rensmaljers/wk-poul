@@ -26,9 +26,9 @@ export default function Countdown({ targetDate }: { targetDate: string }) {
   if (!mounted || !timeLeft) return null
 
   return (
-    <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-5 mb-6 text-white">
+    <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-5 mb-6 text-white text-center">
       <p className="text-sm font-medium text-orange-100 mb-3">Aftellen naar de eerste wedstrijd</p>
-      <div className="flex gap-3 sm:gap-5">
+      <div className="flex gap-3 sm:gap-5 justify-center">
         {[
           { value: timeLeft.days, label: 'dagen' },
           { value: timeLeft.hours, label: 'uur' },

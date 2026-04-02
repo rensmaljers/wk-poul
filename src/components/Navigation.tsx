@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 const navItems = [
   { href: '/', label: 'Stand', icon: '🏆' },
   { href: '/wedstrijden', label: 'Wedstrijden', icon: '⚽' },
+  { href: '/groepen', label: 'Groepen', icon: '📊' },
   { href: '/bonus', label: 'Bonus', icon: '⭐' },
 ]
 

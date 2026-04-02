@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import PredictionForm from '@/components/PredictionForm'
-import GroupStandings from '@/components/GroupStandings'
 import type { Match, Prediction } from '@/lib/types/database'
 
 export default async function WedstrijdenPage() {
@@ -32,11 +31,6 @@ export default async function WedstrijdenPage() {
     return acc
   }, {})
 
-  // Get group names for standings
-  const groupNames = [...new Set(allMatches.filter(m => m.group_name).map(m => m.group_name!))]
-    .sort()
-
-  // Group matches by date for date headers
   function formatDateHeader(dateStr: string) {
     const date = new Date(dateStr)
     const today = new Date()
@@ -47,94 +41,77 @@ export default async function WedstrijdenPage() {
     if (date.toDateString() === tomorrow.toDateString()) return 'Morgen'
 
     return date.toLocaleDateString('nl-NL', {
-      weekday: 'long',
+      weekday: 'short',
       day: 'numeric',
-      month: 'long',
+      month: 'short',
     })
   }
 
+  // Count predictions
+  const totalMatches = allMatches.length
+  const filledIn = allMatches.filter(m => predictionMap.has(m.id)).length
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Wedstrijden & Voorspellingen</h1>
-      <p className="text-gray-500 mb-6">
-        Vul je voorspellingen in voor de wedstrijden. Je kunt wijzigen tot de wedstrijd begint.
-      </p>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Wedstrijden</h1>
+          <p className="text-gray-500 text-sm">Vul je voorspellingen in. Vergrendeld bij aanvang.</p>
+        </div>
+        <span className="text-xs bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full font-semibold flex-shrink-0">
+          {filledIn}/{totalMatches}
+        </span>
+      </div>
 
       {allMatches.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
           <p className="text-5xl mb-4">⚽</p>
-          <p className="text-lg text-gray-600 mb-2">Nog geen wedstrijden beschikbaar</p>
-          <p className="text-sm text-gray-400">
-            Het speelschema wordt automatisch opgehaald zodra het beschikbaar is.
-          </p>
+          <p className="text-lg text-gray-600">Nog geen wedstrijden beschikbaar</p>
         </div>
       ) : (
-        <>
-          {/* Group Standings */}
-          {groupNames.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <span className="w-1 h-6 bg-orange-500 rounded-full"></span>
-                Groepsstanden
+        Object.entries(grouped).map(([stage, stageMatches]) => {
+          const byDate = stageMatches.reduce((acc: Record<string, Match[]>, match) => {
+            const dateKey = new Date(match.match_date).toDateString()
+            if (!acc[dateKey]) acc[dateKey] = []
+            acc[dateKey].push(match)
+            return acc
+          }, {})
+
+          return (
+            <div key={stage} className="mb-6">
+              <h2 className="text-base font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <span className="w-1 h-5 bg-orange-500 rounded-full"></span>
+                {stage}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {groupNames.map(group => (
-                  <GroupStandings
-                    key={group}
-                    group={group}
-                    matches={allMatches.filter(m => m.group_name === group)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* Matches grouped by stage */}
-          {Object.entries(grouped).map(([stage, stageMatches]) => {
-            // Group stage matches by date
-            const byDate = stageMatches.reduce((acc: Record<string, Match[]>, match) => {
-              const dateKey = new Date(match.match_date).toDateString()
-              if (!acc[dateKey]) acc[dateKey] = []
-              acc[dateKey].push(match)
-              return acc
-            }, {})
-
-            return (
-              <div key={stage} className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <span className="w-1 h-6 bg-orange-500 rounded-full"></span>
-                  {stage}
-                </h2>
-
-                {Object.entries(byDate).map(([dateKey, dateMatches]) => (
-                  <div key={dateKey} className="mb-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="h-px bg-gray-200 flex-1"></div>
-                      <span className="text-sm font-medium text-gray-500 px-2">
-                        {formatDateHeader(dateMatches[0].match_date)}
-                      </span>
-                      <div className="h-px bg-gray-200 flex-1"></div>
-                    </div>
-
-                    <div className="space-y-2">
-                      {dateMatches.map((match) => {
-                        const locked = new Date(match.match_date) <= now
-                        return (
-                          <PredictionForm
-                            key={match.id}
-                            match={match}
-                            prediction={predictionMap.get(match.id) ?? null}
-                            locked={locked}
-                          />
-                        )
-                      })}
-                    </div>
+              {Object.entries(byDate).map(([dateKey, dateMatches]) => (
+                <div key={dateKey} className="mb-3">
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <div className="h-px bg-gray-200 flex-1"></div>
+                    <span className="text-xs font-medium text-gray-400">
+                      {formatDateHeader(dateMatches[0].match_date)}
+                    </span>
+                    <div className="h-px bg-gray-200 flex-1"></div>
                   </div>
-                ))}
-              </div>
-            )
-          })}
-        </>
+
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-50">
+                    {dateMatches.map((match) => {
+                      const locked = new Date(match.match_date) <= now
+                      return (
+                        <PredictionForm
+                          key={match.id}
+                          match={match}
+                          prediction={predictionMap.get(match.id) ?? null}
+                          locked={locked}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })
       )}
     </div>
   )

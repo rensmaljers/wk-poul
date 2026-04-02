@@ -12,21 +12,12 @@ function formatTime(dateStr: string) {
   })
 }
 
-function pointsLabel(points: number | null) {
+function pointsBadge(points: number | null) {
   if (points === null) return null
-  if (points === 5) return { text: 'Exact! +5', color: 'bg-green-100 text-green-700' }
-  if (points === 3) return { text: 'Verschil +3', color: 'bg-blue-100 text-blue-700' }
-  if (points === 2) return { text: 'Winnaar +2', color: 'bg-orange-100 text-orange-700' }
-  return { text: '0 punten', color: 'bg-gray-100 text-gray-500' }
-}
-
-function statusLabel(status: string) {
-  switch (status) {
-    case 'FINISHED': return { text: 'Gespeeld', color: 'bg-green-100 text-green-700' }
-    case 'LIVE': case 'IN_PLAY': return { text: 'LIVE', color: 'bg-red-100 text-red-700 animate-pulse' }
-    case 'PAUSED': return { text: 'Rust', color: 'bg-yellow-100 text-yellow-700' }
-    default: return null
-  }
+  if (points === 5) return { text: '+5', color: 'bg-green-100 text-green-700' }
+  if (points === 3) return { text: '+3', color: 'bg-blue-100 text-blue-700' }
+  if (points === 2) return { text: '+2', color: 'bg-amber-100 text-amber-700' }
+  return { text: '0', color: 'bg-gray-100 text-gray-400' }
 }
 
 export default function PredictionForm({
@@ -74,96 +65,124 @@ export default function PredictionForm({
     router.refresh()
   }
 
-  const pl = pointsLabel(prediction?.points ?? null)
-  const status = statusLabel(match.status)
+  const pb = pointsBadge(prediction?.points ?? null)
+  const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY'
+  const isFinished = match.status === 'FINISHED'
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border p-4 ${
-      locked ? 'border-gray-100' : 'border-orange-200'
-    }`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">{formatTime(match.match_date)}</span>
-          {match.group_name && (
-            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
-              Groep {match.group_name}
-            </span>
-          )}
+    <div className={`px-3 py-2.5 sm:px-4 sm:py-3 ${isLive ? 'bg-red-50/50' : ''}`}>
+      {/* Mobile layout */}
+      <div className="sm:hidden">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs text-gray-400">{formatTime(match.match_date)}</span>
+          <div className="flex items-center gap-1.5">
+            {isLive && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold animate-pulse">LIVE</span>}
+            {isFinished && match.home_score !== null && (
+              <span className="text-[10px] font-bold bg-gray-800 text-white px-1.5 py-0.5 rounded">
+                {match.home_score}-{match.away_score}
+              </span>
+            )}
+            {pb && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pb.color}`}>{pb.text}</span>}
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          {status && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${status.color}`}>
-              {status.text}
-            </span>
-          )}
-          {match.status === 'FINISHED' && match.home_score !== null && (
-            <span className="text-xs font-semibold bg-gray-800 text-white px-2 py-0.5 rounded-full">
-              {match.home_score} - {match.away_score}
-            </span>
-          )}
-          {pl && (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${pl.color}`}>
-              {pl.text}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="flex-1 text-right">
-          <span className="font-medium text-gray-900 text-sm sm:text-base">
-            {match.home_flag && <span className="mr-1.5">{match.home_flag}</span>}
-            {match.home_team}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
+          <div className="flex-1 text-right text-sm truncate">
+            {match.home_flag && <span className="mr-1">{match.home_flag}</span>}
+            <span className="font-medium text-gray-900">{match.home_team}</span>
+          </div>
           <input
-            type="number"
-            min="0"
-            max="20"
-            value={homeScore}
+            type="number" min="0" max="20" value={homeScore}
             onChange={(e) => setHomeScore(e.target.value)}
             disabled={locked}
-            className="w-12 h-10 text-center text-lg font-bold border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="w-9 h-8 text-center text-sm font-bold border border-gray-200 rounded focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
             placeholder="-"
           />
-          <span className="text-gray-400 font-bold">-</span>
+          <span className="text-gray-300 text-xs">-</span>
           <input
-            type="number"
-            min="0"
-            max="20"
-            value={awayScore}
+            type="number" min="0" max="20" value={awayScore}
             onChange={(e) => setAwayScore(e.target.value)}
             disabled={locked}
-            className="w-12 h-10 text-center text-lg font-bold border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="w-9 h-8 text-center text-sm font-bold border border-gray-200 rounded focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
             placeholder="-"
           />
-        </div>
-
-        <div className="flex-1">
-          <span className="font-medium text-gray-900 text-sm sm:text-base">
-            {match.away_flag && <span className="mr-1.5">{match.away_flag}</span>}
-            {match.away_team}
-          </span>
+          <div className="flex-1 text-sm truncate">
+            {match.away_flag && <span className="mr-1">{match.away_flag}</span>}
+            <span className="font-medium text-gray-900">{match.away_team}</span>
+          </div>
+          {!locked && (
+            <button
+              onClick={handleSave}
+              disabled={saving || homeScore === '' || awayScore === ''}
+              className={`px-2 py-1 rounded text-xs font-semibold flex-shrink-0 transition-all ${
+                saved ? 'bg-green-100 text-green-700' : 'bg-orange-600 text-white disabled:opacity-30'
+              }`}
+            >
+              {saving ? '...' : saved ? '✓' : '→'}
+            </button>
+          )}
         </div>
       </div>
 
-      {!locked && (
-        <div className="mt-3 flex justify-center">
-          <button
-            onClick={handleSave}
-            disabled={saving || homeScore === '' || awayScore === ''}
-            className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-              saved
-                ? 'bg-green-100 text-green-700'
-                : 'bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-40'
-            }`}
-          >
-            {saving ? 'Opslaan...' : saved ? 'Opgeslagen!' : prediction ? 'Bijwerken' : 'Opslaan'}
-          </button>
+      {/* Desktop layout - single row */}
+      <div className="hidden sm:flex items-center gap-3">
+        <span className="text-xs text-gray-400 w-12 flex-shrink-0">{formatTime(match.match_date)}</span>
+
+        <div className="flex-1 text-right truncate">
+          {match.home_flag && <span className="mr-1.5">{match.home_flag}</span>}
+          <span className="font-medium text-gray-900 text-sm">{match.home_team}</span>
         </div>
-      )}
+
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <input
+            type="number" min="0" max="20" value={homeScore}
+            onChange={(e) => setHomeScore(e.target.value)}
+            disabled={locked}
+            className="w-10 h-8 text-center text-sm font-bold border border-gray-200 rounded-md focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+            placeholder="-"
+          />
+          <span className="text-gray-300 text-xs">-</span>
+          <input
+            type="number" min="0" max="20" value={awayScore}
+            onChange={(e) => setAwayScore(e.target.value)}
+            disabled={locked}
+            className="w-10 h-8 text-center text-sm font-bold border border-gray-200 rounded-md focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+            placeholder="-"
+          />
+        </div>
+
+        <div className="flex-1 truncate">
+          {match.away_flag && <span className="mr-1.5">{match.away_flag}</span>}
+          <span className="font-medium text-gray-900 text-sm">{match.away_team}</span>
+        </div>
+
+        {/* Result + points */}
+        <div className="flex items-center gap-1.5 flex-shrink-0 w-24 justify-end">
+          {isLive && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold animate-pulse">LIVE</span>}
+          {isFinished && match.home_score !== null && (
+            <span className="text-[10px] font-bold bg-gray-800 text-white px-1.5 py-0.5 rounded">
+              {match.home_score}-{match.away_score}
+            </span>
+          )}
+          {pb && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pb.color}`}>{pb.text}</span>}
+        </div>
+
+        {/* Save button */}
+        <div className="w-16 flex-shrink-0 text-right">
+          {!locked ? (
+            <button
+              onClick={handleSave}
+              disabled={saving || homeScore === '' || awayScore === ''}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                saved ? 'bg-green-100 text-green-700' : 'bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-30'
+              }`}
+            >
+              {saving ? '...' : saved ? '✓' : prediction ? 'Wijzig' : 'Opslaan'}
+            </button>
+          ) : (
+            <span className="text-[10px] text-gray-300">🔒</span>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
