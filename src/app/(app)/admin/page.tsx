@@ -8,6 +8,7 @@ const ADMIN_EMAILS = [
   'rens@recranet.com',
   'rens@elloro.nl',
   'rensmaljers@gmail.com',
+  'dazz@elloro.nl',
 ]
 
 export default async function AdminPage() {
