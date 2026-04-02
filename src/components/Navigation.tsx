@@ -66,7 +66,7 @@ export default function Navigation({ userName }: { userName: string }) {
               onClick={handleLogout}
               className="text-xs sm:text-sm text-orange-200 hover:text-white transition-colors whitespace-nowrap"
             >
-              Uit
+              Uitloggen
             </button>
           </div>
         </div>
