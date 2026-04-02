@@ -2,42 +2,70 @@ import { createClient } from '@/lib/supabase/server'
 import BonusForm from '@/components/BonusForm'
 import type { BonusPrediction } from '@/lib/types/database'
 
+const WK_LANDEN = [
+  'Argentinië', 'Australië', 'België', 'Bolivia', 'Brazilië', 'Canada',
+  'Chili', 'Colombia', 'Costa Rica', 'Denemarken', 'Duitsland', 'Ecuador',
+  'Egypte', 'Engeland', 'Frankrijk', 'Honduras', 'Hongarije', 'Indonesië',
+  'Iran', 'Italië', 'Ivoorkust', 'Jamaica', 'Japan', 'Kameroen',
+  'Kroatië', 'Marokko', 'Mexico', 'Nederland', 'Nigeria', 'Noord-Macedonië',
+  'Oekraïne', 'Oezbekistan', 'Panama', 'Paraguay', 'Peru', 'Polen',
+  'Portugal', 'Qatar', 'Saudi-Arabië', 'Schotland', 'Senegal', 'Servië',
+  'Slovenië', 'Spanje', 'Trinidad en Tobago', 'Turkije', 'Uruguay',
+  'USA', 'Venezuela', 'Wales', 'Zuid-Korea', 'Zwitserland',
+]
+
 const BONUS_QUESTIONS = [
   {
     key: 'world_champion',
     question: 'Wie wordt wereldkampioen?',
-    points: 10,
-    type: 'text' as const,
+    points: 15,
+    type: 'select' as const,
+    options: WK_LANDEN,
   },
   {
     key: 'runner_up',
     question: 'Wie wordt de verliezend finalist?',
-    points: 7,
-    type: 'text' as const,
+    points: 10,
+    type: 'select' as const,
+    options: WK_LANDEN,
   },
   {
     key: 'top_scorer',
     question: 'Wie wordt topscorer van het toernooi?',
-    points: 7,
+    points: 10,
     type: 'text' as const,
   },
   {
     key: 'netherlands_stage',
     question: 'Hoe ver komt Nederland?',
-    points: 5,
+    points: 10,
     type: 'select' as const,
     options: ['Groepsfase', 'Achtste finale', 'Kwartfinale', 'Halve finale', 'Finale', 'Wereldkampioen'],
   },
   {
+    key: 'most_goals_team',
+    question: 'Welk land scoort de meeste doelpunten?',
+    points: 10,
+    type: 'select' as const,
+    options: WK_LANDEN,
+  },
+  {
     key: 'total_goals',
     question: 'Hoeveel doelpunten worden er in totaal gescoord?',
-    points: 5,
+    points: 10,
     type: 'number' as const,
   },
   {
     key: 'first_red_card',
     question: 'Welk land krijgt de eerste rode kaart?',
-    points: 5,
+    points: 7,
+    type: 'select' as const,
+    options: WK_LANDEN,
+  },
+  {
+    key: 'biggest_surprise',
+    question: 'Welk land uit pot 3 of 4 haalt de kwartfinale?',
+    points: 10,
     type: 'text' as const,
   },
 ]

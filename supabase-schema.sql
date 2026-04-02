@@ -83,12 +83,14 @@ CREATE TABLE predictions (
 
 ALTER TABLE predictions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view all predictions for finished matches"
+CREATE POLICY "Users can view predictions for started matches"
   ON predictions FOR SELECT
   USING (
     auth.uid() = user_id
     OR EXISTS (
-      SELECT 1 FROM matches WHERE matches.id = predictions.match_id AND matches.status = 'FINISHED'
+      SELECT 1 FROM matches
+      WHERE matches.id = predictions.match_id
+      AND (matches.status IN ('FINISHED', 'LIVE', 'IN_PLAY', 'PAUSED') OR matches.match_date <= NOW())
     )
   );
 

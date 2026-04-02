@@ -45,7 +45,10 @@ export default async function LeaderboardPage() {
                     </span>
                   </td>
                   <td className="py-3 px-4">
-                    <span className="font-medium text-gray-900">{entry.display_name}</span>
+                    <div className="flex items-center gap-2">
+                      {entry.avatar_url && <span className="text-lg">{entry.avatar_url}</span>}
+                      <span className="font-medium text-gray-900">{entry.display_name}</span>
+                    </div>
                   </td>
                   <td className="py-3 px-4 text-center text-sm text-gray-600 hidden sm:table-cell">
                     {entry.exact_scores}

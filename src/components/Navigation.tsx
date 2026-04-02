@@ -24,13 +24,13 @@ export default function Navigation({ userName }: { userName: string }) {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-orange-600 sticky top-0 z-50 shadow-md">
       <div className="max-w-5xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-gray-900">WK Poule</span>
-            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">
-              2026
+            <span className="text-xl font-bold text-white">WK Poule 2026</span>
+            <span className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full font-medium">
+              Recranet X Elloro
             </span>
           </div>
 
@@ -41,8 +41,8 @@ export default function Navigation({ userName }: { userName: string }) {
                 href={item.href}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname === item.href
-                    ? 'bg-orange-100 text-orange-700'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-white/20 text-white'
+                    : 'text-orange-100 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <span className="mr-1.5">{item.icon}</span>
@@ -52,10 +52,17 @@ export default function Navigation({ userName }: { userName: string }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 hidden sm:block">{userName}</span>
+            <Link
+              href="/profiel"
+              className={`text-sm font-medium transition-colors ${
+                pathname === '/profiel' ? 'text-white' : 'text-orange-100 hover:text-white'
+              }`}
+            >
+              {userName}
+            </Link>
             <button
               onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-sm text-orange-200 hover:text-white transition-colors"
             >
               Uitloggen
             </button>
