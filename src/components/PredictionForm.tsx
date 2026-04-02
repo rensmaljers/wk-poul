@@ -124,20 +124,22 @@ export default function PredictionForm({
       </div>
 
       {/* Desktop layout - single row */}
-      <div className="hidden sm:flex items-center gap-3">
-        <span className="text-xs text-gray-400 w-12 flex-shrink-0">{formatTime(match.match_date)}</span>
+      <div className="hidden sm:flex items-center gap-2">
+        <span className="text-xs text-gray-400 w-11 flex-shrink-0">{formatTime(match.match_date)}</span>
 
-        <div className="flex-1 text-right truncate">
-          {match.home_flag && <span className="mr-1.5">{match.home_flag}</span>}
-          <span className="font-medium text-gray-900 text-sm">{match.home_team}</span>
+        <div className="w-40 text-right flex-shrink-0">
+          <span className="font-medium text-gray-900 text-sm">
+            {match.home_team}
+          </span>
+          {match.home_flag && <span className="ml-1.5">{match.home_flag}</span>}
         </div>
 
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1 flex-shrink-0">
           <input
             type="number" min="0" max="20" value={homeScore}
             onChange={(e) => setHomeScore(e.target.value)}
             disabled={locked}
-            className="w-10 h-8 text-center text-sm font-bold border border-gray-200 rounded-md focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+            className="w-9 h-7 text-center text-sm font-bold border border-gray-200 rounded focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
             placeholder="-"
           />
           <span className="text-gray-300 text-xs">-</span>
@@ -145,18 +147,18 @@ export default function PredictionForm({
             type="number" min="0" max="20" value={awayScore}
             onChange={(e) => setAwayScore(e.target.value)}
             disabled={locked}
-            className="w-10 h-8 text-center text-sm font-bold border border-gray-200 rounded-md focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+            className="w-9 h-7 text-center text-sm font-bold border border-gray-200 rounded focus:border-orange-500 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
             placeholder="-"
           />
         </div>
 
-        <div className="flex-1 truncate">
+        <div className="w-40 flex-shrink-0">
           {match.away_flag && <span className="mr-1.5">{match.away_flag}</span>}
           <span className="font-medium text-gray-900 text-sm">{match.away_team}</span>
         </div>
 
-        {/* Result + points */}
-        <div className="flex items-center gap-1.5 flex-shrink-0 w-24 justify-end">
+        {/* Result + points + save */}
+        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
           {isLive && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold animate-pulse">LIVE</span>}
           {isFinished && match.home_score !== null && (
             <span className="text-[10px] font-bold bg-gray-800 text-white px-1.5 py-0.5 rounded">
@@ -164,15 +166,11 @@ export default function PredictionForm({
             </span>
           )}
           {pb && <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pb.color}`}>{pb.text}</span>}
-        </div>
-
-        {/* Save button */}
-        <div className="w-16 flex-shrink-0 text-right">
           {!locked ? (
             <button
               onClick={handleSave}
               disabled={saving || homeScore === '' || awayScore === ''}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+              className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
                 saved ? 'bg-green-100 text-green-700' : 'bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-30'
               }`}
             >

@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Navigation userName={profile?.display_name ?? user.email ?? 'Gebruiker'} />
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
         {children}
       </main>
       <footer className="text-center py-4 text-sm text-gray-400 border-t border-gray-100">
