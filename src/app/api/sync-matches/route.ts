@@ -68,8 +68,19 @@ function translateStage(stage: string): string {
   return map[stage] ?? stage
 }
 
+// Supported competitions
+const COMPETITIONS: Record<string, { code: string; name: string; translateStages: boolean }> = {
+  WC: { code: 'WC', name: 'WK 2026', translateStages: true },
+  DED: { code: 'DED', name: 'Eredivisie', translateStages: false },
+}
+
+// Translate Eredivisie matchday to stage name
+function formatMatchday(matchday: number | null): string {
+  if (!matchday) return 'Eredivisie'
+  return `Speelronde ${matchday}`
+}
+
 export async function GET(request: Request) {
-  // Simple auth check via query param (use a secret key in production)
   const { searchParams } = new URL(request.url)
   const secret = searchParams.get('secret')
 
@@ -82,54 +93,72 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'FOOTBALL_DATA_API_KEY not configured' }, { status: 500 })
   }
 
-  try {
-    // FIFA World Cup 2026 competition code = WC
-    const response = await fetch('https://api.football-data.org/v4/competitions/WC/matches', {
-      headers: { 'X-Auth-Token': apiKey },
-      next: { revalidate: 0 },
-    })
+  // Which competition to sync (default: all)
+  const comp = searchParams.get('competition') ?? 'all'
+  const compsToSync = comp === 'all'
+    ? Object.keys(COMPETITIONS)
+    : [comp.toUpperCase()]
 
-    if (!response.ok) {
-      const text = await response.text()
-      return NextResponse.json({ error: 'Football API error', details: text }, { status: response.status })
+  const results: Record<string, { total: number; upserted: number }> = {}
+
+  const supabase = createAdminClient()
+
+  for (const compKey of compsToSync) {
+    const competition = COMPETITIONS[compKey]
+    if (!competition) continue
+
+    try {
+      const response = await fetch(`https://api.football-data.org/v4/competitions/${competition.code}/matches`, {
+        headers: { 'X-Auth-Token': apiKey },
+        next: { revalidate: 0 },
+      })
+
+      if (!response.ok) {
+        const text = await response.text()
+        results[compKey] = { total: 0, upserted: 0 }
+        console.error(`Failed to sync ${compKey}:`, text)
+        continue
+      }
+
+      const data = await response.json()
+      const matches = data.matches ?? []
+
+      let upserted = 0
+      for (const match of matches) {
+        const homeTeam = match.homeTeam?.name ?? 'TBD'
+        const awayTeam = match.awayTeam?.name ?? 'TBD'
+
+        const stage = competition.translateStages
+          ? translateStage(match.stage)
+          : formatMatchday(match.matchday)
+
+        const { error } = await supabase
+          .from('matches')
+          .upsert({
+            external_id: match.id,
+            competition: compKey,
+            stage,
+            group_name: match.group?.replace('GROUP_', '') ?? null,
+            home_team: homeTeam,
+            away_team: awayTeam,
+            home_flag: getFlag(homeTeam),
+            away_flag: getFlag(awayTeam),
+            home_score: match.score?.fullTime?.home ?? null,
+            away_score: match.score?.fullTime?.away ?? null,
+            match_date: match.utcDate,
+            status: match.status,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'external_id' })
+
+        if (!error) upserted++
+      }
+
+      results[compKey] = { total: matches.length, upserted }
+    } catch (error) {
+      console.error(`Failed to sync ${compKey}:`, error)
+      results[compKey] = { total: 0, upserted: 0 }
     }
-
-    const data = await response.json()
-    const matches = data.matches ?? []
-
-    const supabase = createAdminClient()
-
-    let upserted = 0
-    for (const match of matches) {
-      const homeTeam = match.homeTeam?.name ?? 'TBD'
-      const awayTeam = match.awayTeam?.name ?? 'TBD'
-
-      const { error } = await supabase
-        .from('matches')
-        .upsert({
-          external_id: match.id,
-          stage: translateStage(match.stage),
-          group_name: match.group?.replace('GROUP_', '') ?? null,
-          home_team: homeTeam,
-          away_team: awayTeam,
-          home_flag: getFlag(homeTeam),
-          away_flag: getFlag(awayTeam),
-          home_score: match.score?.fullTime?.home ?? null,
-          away_score: match.score?.fullTime?.away ?? null,
-          match_date: match.utcDate,
-          status: match.status,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'external_id' })
-
-      if (!error) upserted++
-    }
-
-    return NextResponse.json({
-      success: true,
-      total: matches.length,
-      upserted,
-    })
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to sync', details: String(error) }, { status: 500 })
   }
+
+  return NextResponse.json({ success: true, results })
 }

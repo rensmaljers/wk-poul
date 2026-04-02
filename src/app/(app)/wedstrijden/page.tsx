@@ -1,14 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import PredictionForm from '@/components/PredictionForm'
+import CompetitionSwitcher from '@/components/CompetitionSwitcher'
 import type { Match, Prediction } from '@/lib/types/database'
 
-export default async function WedstrijdenPage() {
+export default async function WedstrijdenPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ comp?: string }>
+}) {
+  const { comp = 'WC' } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: matches } = await supabase
     .from('matches')
     .select('*')
+    .eq('competition', comp)
     .order('match_date', { ascending: true }) as { data: Match[] | null }
 
   const { data: predictions } = await supabase
@@ -47,7 +54,6 @@ export default async function WedstrijdenPage() {
     })
   }
 
-  // Count predictions
   const totalMatches = allMatches.length
   const filledIn = allMatches.filter(m => predictionMap.has(m.id)).length
 
@@ -63,10 +69,15 @@ export default async function WedstrijdenPage() {
         </span>
       </div>
 
+      <CompetitionSwitcher current={comp} />
+
       {allMatches.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
           <p className="text-5xl mb-4">⚽</p>
           <p className="text-lg text-gray-600">Nog geen wedstrijden beschikbaar</p>
+          <p className="text-sm text-gray-400 mt-1">
+            {comp === 'DED' ? 'Sync de Eredivisie via /api/sync-matches?competition=DED' : 'Het speelschema wordt automatisch opgehaald.'}
+          </p>
         </div>
       ) : (
         Object.entries(grouped).map(([stage, stageMatches]) => {

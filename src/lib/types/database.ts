@@ -32,6 +32,7 @@ export type Database = {
           away_flag: string | null
           home_score: number | null
           away_score: number | null
+          competition: string
           match_date: string
           status: 'SCHEDULED' | 'LIVE' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED'
           created_at: string
@@ -40,6 +41,7 @@ export type Database = {
         Insert: {
           id?: number
           external_id: number
+          competition?: string
           stage: string
           group_name?: string | null
           home_team: string
