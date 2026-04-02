@@ -1,12 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { isAdmin } from '@/lib/config'
 import type { Prediction, Match } from '@/lib/types/database'
 
 export default async function StatsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !isAdmin(user.email)) redirect('/')
 
   const { data: profiles } = await supabase
     .from('profiles')
